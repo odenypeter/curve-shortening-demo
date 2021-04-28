@@ -35,10 +35,51 @@ export function remesh(cu : Curve, seglength : number) {
             cu.splice(i--,1);
         }
     }
+
+    // Get points for the polygon
+    getPolygonCordinates(cu)
+
+    console.log('CU:::', cu)
 }
 
 export function clean(cu : Curve) {
     for (let i = 0; i < cu.length; i++) {
         if (equals(cu.get(i), cu.get(i+2))) cu.splice(i--,2);
     }
+}
+
+export function getPolygonCordinates(cu: Curve) {
+    const coordinates = cu._data;
+    let newCordinates = null;
+    if(coordinates.length > 300) {
+        newCordinates = coordinates.filter(function(item, index, Arr){
+            return index % 15 == 0
+        });
+    } else if(coordinates.length > 100  && coordinates.length < 300) {
+        newCordinates = coordinates.filter(function(item, index, Arr){
+            return index % 10 == 0
+        });
+    } else if(coordinates.length < 100) {
+        newCordinates = coordinates.filter(function(item, index, Arr){
+            return index % 8 == 0
+        });
+    }
+
+    writeToCsv(newCordinates)
+    console.log('New Coordinates:::', newCordinates)
+}
+
+export function writeToCsv(coordinates: any) {
+    // if(coordinates && coordinates.length) {
+    //     for () {
+    //         const element = array[index];
+            
+    //     }
+    // }
+    const rows = ['x', 'y']
+    let csvContent = "data:text/csv;charset=utf-8," 
+    + coordinates.map((e: any) => e.join(",")).join("\n");
+
+    var encodedUri = encodeURI(csvContent);
+    window.open(encodedUri);
 }
