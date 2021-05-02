@@ -7,7 +7,7 @@ import { Point, add, subtract, scale, squaredLength, equals,
     Curve, ScalarFunction } from './geometry';
 
 // Forward Euler approximation to CSF with tangential reparametrization
-export function reparametrizedCSF(dt : number) : LocalFunction<Point, Point>{
+export function  reparametrizedCSF(dt : number) : LocalFunction<Point, Point>{
     return (point, index, x) => {
         let laplacian = add(x(1), x(-1), scale(x(0),-2));
         let dr2 = squaredLength(subtract(x(1),x(-1))) * 0.25;
@@ -23,23 +23,25 @@ export function remesh(cu : Curve, seglength : number) {
         const displacement = subtract(b,a);
         const dr2 = squaredLength(displacement);
 
-        if (dr2 > 4*seglength*seglength) {
-            // If vertices are too far apart, add a new vertex in between
-            cu.splice(1+i, 0,
-                add(a, scale(displacement, seglength * dr2 ** (-1/2)))
-            );
-        }
+        // if (i % 2 !== 0) {
+        //     cu.splice(i, 1)
+        // }
 
-        else if (cu.length > 4 && dr2 * 4 < seglength**2) {
-            // If vertices are too close, remove one of them
-            cu.splice(i--,1);
-        }
+        // if (dr2 > 4*seglength*seglength) {
+        //     // If vertices are too far apart, add a new vertex in between
+        //     cu.splice(1+i, 0,
+        //         add(a, scale(displacement, seglength * dr2 ** (-1/2)))
+        //     );
+        // }
+
+        // else if (cu.length > 4 && dr2 * 4 < seglength**2) {
+        //     // If vertices are too close, remove one of them
+        //     cu.splice(i--,1);
+        // }
     }
 
     // Get points for the polygon
-    getPolygonCordinates(cu)
-
-    console.log('CU:::', cu)
+    // getPolygonCordinates(cu)
 }
 
 export function clean(cu : Curve) {
@@ -50,23 +52,7 @@ export function clean(cu : Curve) {
 
 export function getPolygonCordinates(cu: Curve) {
     const coordinates = cu._data;
-    let newCordinates = null;
-    if(coordinates.length > 300) {
-        newCordinates = coordinates.filter(function(item, index, Arr){
-            return index % 15 == 0
-        });
-    } else if(coordinates.length > 100  && coordinates.length < 300) {
-        newCordinates = coordinates.filter(function(item, index, Arr){
-            return index % 10 == 0
-        });
-    } else if(coordinates.length < 100) {
-        newCordinates = coordinates.filter(function(item, index, Arr){
-            return index % 8 == 0
-        });
-    }
-
-    writeToCsv(newCordinates)
-    console.log('New Coordinates:::', newCordinates)
+    // writeToCsv(coordinates)
 }
 
 export function writeToCsv(coordinates: any) {

@@ -187,6 +187,15 @@ class CSFApp extends LitElement {
             let l = squaredLength(d)**(1/2);
             path.push(add(q,scale(d,this.seglength/l)));
         }
+        console.log('Path Before:::', path.length)
+
+        for(let i=0; i < path.length; i++) {
+            if(i % 10 !== 0) {
+                path.splice(i, 1)
+            }
+        }
+
+        console.log('Path After:::', path.length)
 
         this.curves.push(new Curve(path));
         this.touchPaths.delete(e.identifier);
@@ -240,8 +249,8 @@ class CSFApp extends LitElement {
             this.curves[j] = cu;
 
             // Clean
-            remesh(cu, this.seglength);
-            clean(cu);
+            // remesh(cu, this.seglength);
+            // clean(cu);
 
             const colorFunction: LocalFunction<Point,string> = 
                 this.colorCode 
