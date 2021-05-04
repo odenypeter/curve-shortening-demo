@@ -3,9 +3,7 @@ import commonjs from 'rollup-plugin-commonjs';
 import { terser } from 'rollup-plugin-terser';
 import babel from 'rollup-plugin-babel';
 import typescript from 'rollup-plugin-typescript';
-import globals from 'rollup-plugin-node-globals';
-import nodePolyfills from 'rollup-plugin-node-polyfills';
-import builtins from 'rollup-plugin-node-builtins';
+
 
 // Rollup config for minified production builds
 
@@ -16,7 +14,6 @@ const config = (output, babelConf) => ({
 		console.error(`(!) ${warning.message}`);
 	},
 	plugins: [
-        nodePolyfills(),
 		typescript(),
 		resolve({ preferBuiltins: false }),
 		commonjs(),
@@ -26,11 +23,8 @@ const config = (output, babelConf) => ({
 			mangle: {
 				module: true,
 			},
-		}),
-        nodePolyfills(),
-        globals(),
+		})
 	],
-	external: builtins,
 
 });
 

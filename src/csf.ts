@@ -9,7 +9,7 @@ import { LocalFunction } from './CircularList';
 import { LitElement, html, property, query, customElement } from 'lit-element';
 import interpolate from 'color-interpolate';
 import bind from 'bind-decorator';
-// import fs from "fs";
+import fs from 'fs';
 
 const d2 = (a: Point, b: Point) => squaredLength(subtract(a, b));
 const dt = 1;
@@ -53,7 +53,11 @@ class CSFApp extends LitElement {
 	seglength: number = 5;
 
 	numberIters = 100;
-	Coordinates = [];
+
+	Coordinates: any[] = [['x', 'y']];
+
+	numberOfIters = 0
+	savedTimes = 0
 
 	@query('canvas') canvas?: HTMLCanvasElement;
 	get ctx(): CanvasRenderingContext2D | null {
@@ -77,6 +81,9 @@ class CSFApp extends LitElement {
 
 	@property({ type: Boolean })
 	saveData = false;
+
+	@property({ type: Number })
+	iterations = 10;
 
 	render() {
 		return html`
@@ -195,15 +202,10 @@ class CSFApp extends LitElement {
 			let l = squaredLength(d) ** (1 / 2);
 			path.push(add(q, scale(d, this.seglength / l)));
 		}
-		console.log('Path Before:::', path.length);
-
-		for (let i = 0; i < path.length; i++) {
-			if (i % 2 !== 0) {
-				path.splice(i, 1);
-			}
-		}
-
-		console.log('Path After:::', path.length);
+		
+		// add all the points to data
+		const data = path.map(item => [Math.round(item[0] * 10000) / 10000, Math.round(item[1] * 10000) / 10000])
+		this.Coordinates = [...this.Coordinates, ...data]
 
 		this.curves.push(new Curve(path));
 		this.touchPaths.delete(e.identifier);
@@ -211,6 +213,7 @@ class CSFApp extends LitElement {
 
 	@bind
 	tick() {
+		this.numberOfIters += 1
 		requestAnimationFrame(this.tick);
 		if (this.paused) return;
 		const canvas = this.canvas;
@@ -239,14 +242,16 @@ class CSFApp extends LitElement {
 		this.curves = this.curves.filter((cu) => cu.length >= 10 && cu.curvature().max() < 4000);
 
 		const inBounds = ([x, y]: Point) => x > 0 && x < canvas.width && y > 0 && y < canvas.height;
+
+		// allData
+
 		for (let [j, cu] of this.curves.entries()) {
 			const area = cu.area();
 
 			cu = cu.filter(inBounds);
 
-            cu.findAngles()
-            removeNodes(cu)
-
+			// cu.findAngles()
+			// removeNodes(cu)
 
 			// Flow
 			cu = cu.map(reparametrizedCSF(dt / cu.curvature().max()));
@@ -262,8 +267,29 @@ class CSFApp extends LitElement {
 			// 	cu.splice(i, 1);
 			// }
 			remesh(cu, this.seglength);
+			clean(cu);
 
-			// clean(cu);
+			if (this.saveData) {
+				// call save data
+				console.log('savedTimes::', this.savedTimes)
+				console.log('this.iterations::', this.iterations)
+				console.log('numberOfIters::', this.numberOfIters)
+				if(this.numberOfIters % 100 == 0 && this.savedTimes <= this.iterations) {
+					this.savedTimes += 1
+						this.Coordinates = [...this.Coordinates,...[[' ', ''], [' ', ' ']], ...cu._data];
+					
+			
+					if(this.savedTimes == this.iterations) {
+						// save data to file
+						if (this.saveData) {
+							let csvContent =
+								'data:text/csv;charset=utf-8,' + this.Coordinates.map((e: any) => e.join(',')).join('\n');
+							var encodedUri = encodeURI(csvContent);
+							window.open(encodedUri);
+						}
+					}
+				}
+			}
 
 			const colorFunction: LocalFunction<Point, string> = this.colorCode
 				? (p, i, x) => curvatureColor(curvature(x))
@@ -276,7 +302,6 @@ class CSFApp extends LitElement {
 }
 
 function demoCurve(canvas: HTMLCanvasElement) {
-    // console.log('FS', fs)
 	// Generate an interesting demo curve to start.
 	var N = 200;
 	var curve: Point[] = [];
