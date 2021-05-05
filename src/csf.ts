@@ -55,9 +55,10 @@ class CSFApp extends LitElement {
 	numberIters = 100;
 
 	Coordinates: any[] = [['x', 'y']];
+	coordinatesData: any = {};
 
-	numberOfIters = 0
-	savedTimes = 0
+	numberOfIters = 0;
+	savedTimes = 0;
 
 	@query('canvas') canvas?: HTMLCanvasElement;
 	get ctx(): CanvasRenderingContext2D | null {
@@ -83,7 +84,7 @@ class CSFApp extends LitElement {
 	saveData = false;
 
 	@property({ type: Number })
-	iterations = 10;
+	iterations = 5;
 
 	render() {
 		return html`
@@ -130,7 +131,7 @@ class CSFApp extends LitElement {
 
 	@bind
 	startFlow() {
-		this.canvas && this.curves.push(demoCurve(this.canvas));
+		// this.canvas && this.curves.push(demoCurve(this.canvas));
 		this.tick();
 	}
 
@@ -202,10 +203,13 @@ class CSFApp extends LitElement {
 			let l = squaredLength(d) ** (1 / 2);
 			path.push(add(q, scale(d, this.seglength / l)));
 		}
-		
+
 		// add all the points to data
-		const data = path.map(item => [Math.round(item[0] * 10000) / 10000, Math.round(item[1] * 10000) / 10000])
-		this.Coordinates = [...this.Coordinates, ...data]
+		const data = path.map((item) => [
+			Math.round(item[0] * 10000) / 10000,
+			Math.round(item[1] * 10000) / 10000,
+		]);
+		this.coordinatesData[`polygon-${this.savedTimes}`] = data;
 
 		this.curves.push(new Curve(path));
 		this.touchPaths.delete(e.identifier);
@@ -213,7 +217,7 @@ class CSFApp extends LitElement {
 
 	@bind
 	tick() {
-		this.numberOfIters += 1
+		this.numberOfIters += 1;
 		requestAnimationFrame(this.tick);
 		if (this.paused) return;
 		const canvas = this.canvas;
@@ -263,29 +267,31 @@ class CSFApp extends LitElement {
 
 			this.curves[j] = cu;
 
-			// if (j % 2 !== 0) {
-			// 	cu.splice(i, 1);
-			// }
 			remesh(cu, this.seglength);
 			clean(cu);
 
 			if (this.saveData) {
 				// call save data
-				console.log('savedTimes::', this.savedTimes)
-				console.log('this.iterations::', this.iterations)
-				console.log('numberOfIters::', this.numberOfIters)
-				if(this.numberOfIters % 100 == 0 && this.savedTimes <= this.iterations) {
-					this.savedTimes += 1
-						this.Coordinates = [...this.Coordinates,...[[' ', ''], [' ', ' ']], ...cu._data];
-					
-			
-					if(this.savedTimes == this.iterations) {
+				// console.log('savedTimes::', this.savedTimes);
+				// console.log('this.iterations::', this.iterations);
+				// console.log('numberOfIters::', this.numberOfIters);
+				if (this.numberOfIters % 50 == 0 && this.savedTimes <= this.iterations) {
+					this.savedTimes += 1;
+					this.coordinatesData[`polygon-${this.savedTimes}`] = cu._data;
+
+					if (this.savedTimes == this.iterations) {
 						// save data to file
 						if (this.saveData) {
-							let csvContent =
-								'data:text/csv;charset=utf-8,' + this.Coordinates.map((e: any) => e.join(',')).join('\n');
-							var encodedUri = encodeURI(csvContent);
-							window.open(encodedUri);
+							const blob = new Blob([JSON.stringify(this.coordinatesData)], {
+								type: 'application/json',
+							});
+							const url = URL.createObjectURL(blob);
+							// Create a new anchor element
+							const a = document.createElement('a');
+							a.href = url;
+							a.download = 'data.json';
+							a.click();
+							a.remove();
 						}
 					}
 				}
