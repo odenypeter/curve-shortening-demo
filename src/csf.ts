@@ -55,7 +55,7 @@ class CSFApp extends LitElement {
 	numberIters = 100;
 
 	Coordinates: any[] = [['x', 'y']];
-	coordinatesData: any = {};
+	coordinatesData = '';
 
 	numberOfIters = 0;
 	savedTimes = 0;
@@ -206,7 +206,7 @@ class CSFApp extends LitElement {
 
 		// add all the points to data
 		const data = path.map((item) => [Math.round(item[0]) / 1000, Math.round(item[1]) / 10000]);
-		this.coordinatesData[`polygon-${this.savedTimes}`] = data;
+		this.coordinatesData += JSON.stringify(data) + '\n\n';
 
 		this.curves.push(new Curve(path));
 		this.touchPaths.delete(e.identifier);
@@ -278,19 +278,19 @@ class CSFApp extends LitElement {
 						Math.round(item[0]) / 1000,
 						Math.round(item[1]) / 10000,
 					]);
-					this.coordinatesData[`polygon-${this.savedTimes}`] = data;
+					this.coordinatesData += JSON.stringify(data) + '%0D%0A%0D%0A';
 
 					if (this.savedTimes == this.iterations) {
 						// save data to file
 						if (this.saveData) {
-							const blob = new Blob([JSON.stringify(this.coordinatesData)], {
-								type: 'application/json',
-							});
-							const url = URL.createObjectURL(blob);
+							// const blob = new Blob([JSON.stringify(this.coordinatesData)], {
+							// 	type: 'application/plain',
+							// });
+							// const url = URL.createObjectURL(blob);
 							// Create a new anchor element
 							const a = document.createElement('a');
-							a.href = url;
-							a.download = 'data.json';
+							a.href = "data:text/plain," + this.coordinatesData;;
+							a.download = 'data.txt';
 							a.click();
 							a.remove();
 						}
