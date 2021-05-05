@@ -205,10 +205,7 @@ class CSFApp extends LitElement {
 		}
 
 		// add all the points to data
-		const data = path.map((item) => [
-			Math.round(item[0] * 10000) / 10000,
-			Math.round(item[1] * 10000) / 10000,
-		]);
+		const data = path.map((item) => [Math.round(item[0]) / 1000, Math.round(item[1]) / 10000]);
 		this.coordinatesData[`polygon-${this.savedTimes}`] = data;
 
 		this.curves.push(new Curve(path));
@@ -275,9 +272,13 @@ class CSFApp extends LitElement {
 				// console.log('savedTimes::', this.savedTimes);
 				// console.log('this.iterations::', this.iterations);
 				// console.log('numberOfIters::', this.numberOfIters);
-				if (this.numberOfIters % 50 == 0 && this.savedTimes <= this.iterations) {
+				if (this.numberOfIters % 50 == 0 && this.savedTimes < this.iterations) {
 					this.savedTimes += 1;
-					this.coordinatesData[`polygon-${this.savedTimes}`] = cu._data;
+					const data = [...cu._data].map((item) => [
+						Math.round(item[0]) / 1000,
+						Math.round(item[1]) / 10000,
+					]);
+					this.coordinatesData[`polygon-${this.savedTimes}`] = data;
 
 					if (this.savedTimes == this.iterations) {
 						// save data to file
