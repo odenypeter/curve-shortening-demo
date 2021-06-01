@@ -1,52 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <title>Curve Shortening Flow - Interactive Demonstration</title>
-    <meta name=viewport content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" type="text/css" href="style.css">
+	<head>
+		<title>Curve Shortening Flow - Interactive Demonstration</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<link rel="stylesheet" type="text/css" href="style.css" />
 
-    <script type="text/javascript" src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.0/webcomponents-loader.js"></script>
+		<script
+			type="text/javascript"
+			src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.0/webcomponents-loader.js"
+		></script>
 
-    <script type="module" src="build/bundle.min.mjs"></script>
-    <script nomodule src="build/bundle.min.js"></script>
-    <!--<script type="module" src="build/bundle.mjs"></script>-->
+		<script type="module" src="build/bundle.min.mjs"></script>
+		<script nomodule src="build/bundle.min.js"></script>
+		<!--<script type="module" src="build/bundle.mjs"></script>-->
 
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script>
-  </head>
-  <body>
-    <csf-app id="app"></csf-app>
-    <div id="info">
-      <div id="controls" onchange="readControl(event.target)">
-        <h2>Options</h2>
-        <label>
-          <input type="checkbox" name="paused">
-          <span>Pause Flow</span>
-        </label>
-        <label>
-          <input type="checkbox" name="preserveArea">
-          <span class="hint" title="Rescales the flow to preserve the signed area of the curve. Does not play nicely with self-intersections">Preserve Area</span>
-        </label>
-        <label>
-          <input type="checkbox" name="colorCode" checked>
-          <span>Color curves by curvature</span>
-        </label>
+		<script
+			type="text/javascript"
+			src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML"
+			async
+		></script>
+	</head>
+	<body>
+		<csf-app id="app"></csf-app>
+		<div id="info">
+			<div id="controls" onchange="readControl(event.target)">
+				<h2>Options</h2>
+				<label>
+					<input type="checkbox" name="paused" />
+					<span>Pause Flow</span>
+				</label>
+				<label>
+					<input type="checkbox" name="preserveArea" />
+					<span
+						class="hint"
+						title="Rescales the flow to preserve the signed area of the curve. Does not play nicely with self-intersections"
+						>Preserve Area</span
+					>
+				</label>
+				<br />
+				<label>
+					<input type="checkbox" name="colorCode" checked />
+					<span>Color curves by curvature</span>
+				</label>
+				<br />
 
+				<label>
+					<input type="checkbox" name="saveData" />
+					<span>Save Data</span>
+				</label>
+				<br />
+
+				<label>
+					<span>Enter number of iterations:</span> <br />
+					<input type="number" name="iterations" value="5" max="20" min="5" />
+				</label>
+				<br />
+
+				<label>
+					<span>Enter vertices: (Format: [(x,y), (x1, y1),...,(xn, yn))]):</span><br />
+					<textarea name="vertices" cols="50" rows="20"></textarea>
+				</label>
         <label>
-          <input type="checkbox" name="saveData">
-          <span>Save Data</span>
+          <button onclick="startCurveFlow()">Start flow</button>
         </label>
-        <label>
-          <span>Enter number of iterations:</span> <br>
-          <input type="number" name="iterations" value=5 max=20 min=5>
-          
-        </label>
-      </div>
-    </div>
-    <script>
-      function readControl(el) {
-        var app = document.getElementById('app');
-        app[el.name] = (el.type == 'checkbox') ? !!el.checked : el.value;
-      }
-    </script>
-  </body>
+			</div>
+		</div>
+		<script>
+			function readControl(el) {
+				var app = document.getElementById('app');
+				app[el.name] = el.type == 'checkbox' ? !!el.checked : el.value;
+			}
+		</script>
+	</body>
 </html>

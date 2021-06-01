@@ -86,6 +86,17 @@ class CSFApp extends LitElement {
 	@property({ type: Number })
 	iterations = 5;
 
+	@property()
+	vertices:any = [];
+
+	constructor() {
+		super();
+		const button = document.querySelector('button');
+		if (button) {
+			button.addEventListener('click', this.startCurveFlow);
+		}
+	}
+
 	render() {
 		return html`
 			<style>
@@ -289,7 +300,7 @@ class CSFApp extends LitElement {
 							// const url = URL.createObjectURL(blob);
 							// Create a new anchor element
 							const a = document.createElement('a');
-							a.href = "data:text/plain," + this.coordinatesData;;
+							a.href = 'data:text/plain,' + this.coordinatesData;
 							a.download = 'data.txt';
 							a.click();
 							a.remove();
@@ -305,6 +316,18 @@ class CSFApp extends LitElement {
 			// Render
 			renderClosedCurve(cu, ctx, { colorFunction });
 		}
+	}
+
+	@bind
+	startCurveFlow() {
+		const pointsArray: any = JSON.parse(this.vertices)
+		this.curves.push(new Curve(pointsArray))
+		pointsArray.forEach((element:any) => {
+			element[0] *=1000
+			element[1] *= 10000
+		});
+		console.log("curves:::", this.curves)
+		requestAnimationFrame(this.startFlow);
 	}
 }
 
