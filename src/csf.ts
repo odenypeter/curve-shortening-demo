@@ -87,7 +87,7 @@ class CSFApp extends LitElement {
 	iterations = 5;
 
 	@property()
-	vertices:any = [];
+	vertices: any = [];
 
 	constructor() {
 		super();
@@ -320,13 +320,12 @@ class CSFApp extends LitElement {
 
 	@bind
 	startCurveFlow() {
-		const pointsArray: any = JSON.parse(this.vertices)
-		this.curves.push(new Curve(pointsArray))
-		pointsArray.forEach((element:any) => {
-			element[0] *=1000
-			element[1] *= 10000
+		const pointsArray: any = JSON.parse(this.vertices);
+		pointsArray.forEach((element: any) => {
+			element[0] *= 1000;
+			element[1] *= 10000;
 		});
-		console.log("curves:::", this.curves)
+		this.curves.push(new Curve(pointsArray));
 		requestAnimationFrame(this.startFlow);
 	}
 }
