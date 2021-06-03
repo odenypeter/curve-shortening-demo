@@ -251,7 +251,7 @@ class CSFApp extends LitElement {
 		ctx.fillStyle = 'black';
 
 		// Destroy curve if it is too small or curvature is too extreme
-		this.curves = this.curves.filter((cu) => cu.length >= 10 && cu.curvature().max() < 4000);
+		this.curves = this.curves.filter((cu) => cu.length >= 3 && cu.curvature().max() < 4000);
 
 		const inBounds = ([x, y]: Point) => x > 0 && x < canvas.width && y > 0 && y < canvas.height;
 
@@ -275,7 +275,7 @@ class CSFApp extends LitElement {
 
 			this.curves[j] = cu;
 
-			remesh(cu, this.seglength);
+			// remesh(cu, this.seglength);
 			clean(cu);
 
 			if (this.saveData) {
@@ -323,7 +323,7 @@ class CSFApp extends LitElement {
 		const pointsArray: any = JSON.parse(this.vertices);
 		pointsArray.forEach((element: any) => {
 			element[0] *= 1000;
-			element[1] *= 10000;
+			element[1] *= 1000;
 		});
 		this.curves.push(new Curve(pointsArray));
 		requestAnimationFrame(this.startFlow);
